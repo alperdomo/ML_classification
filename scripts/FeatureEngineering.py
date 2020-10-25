@@ -160,10 +160,19 @@ def clear_engineer(dataframe, columns_drop, data_type):
         dataframe.to_csv('../data/test_featured.csv', index=False)
     return dataframe
 
+def engineer_test_kaggle(test_data):
+    pred = test_data
+    pred = cabin_names(pred, "test")
+    pred =  name_to_titles(pred)
+    pred, pred_bins_fares = fares(pred)
+    pred =  gender(pred)
+    pred =  ages(pred)
+    pred =  age_per_class(pred, pred_bins_fares)
+    pred =  clear_engineer(pred, columns_drop, "test")
 
 data = pd.read_csv('../data/train.csv')
 columns_drop = ['Age', 'Name', 'Fare',  'Ticket', 'Cabin', 'Embarked', 'int_Age*Pclass']
-pred =
+test_data  = pd.read_csv('../data/test.csv')
 
 if __name__ == "__main__":
     data = cabin_names(data, "training")
@@ -173,4 +182,5 @@ if __name__ == "__main__":
     data = ages(data)
     data = age_per_class(data, bins_fares)
     plot_distribution_titles(data)
-    data = clear_engineer(data, columns_drop, "training")
+    clear_engineer(data, columns_drop, "training")
+    engineer_test_kaggle(test_data)

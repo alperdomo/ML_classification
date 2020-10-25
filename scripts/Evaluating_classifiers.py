@@ -113,16 +113,21 @@ def hyperparam_optimization(X_train, y_train):
     return results_gridcv, acc_random_forest, random_forest
 
 
-def select_features(rf_model, X_train, X_test):
+def select_features(rf_model, X_train, X_test, features):
     relevance_features = pd.DataFrame({"Feature": X_train.columns, \
                         "Relevance": rf_model.feature_importances_}\
                                       ).sort_values(by="Relevance", \
                                                     ascending=False)
-    best_8 = relevance_features["Feature"].values[:8]
-    X_train = X_train[best_8]
-    X_test = X_test[best_8]
-    return relevance_features, X_train, X_test, best_8
+    best_ = relevance_features["Feature"].values[:int(features)]
+    X_train = X_train[best_]
+    X_test = X_test[best_]
+    return relevance_features, X_train, X_test, best_
 
+def run_test_data(pred, best_, rf_model, pred_ids, file_name):
+    pred = pred[best_]
+    y_pred = rf_model.predict(pred)
+    kaggle = pd.DataFrame({"PassengerId":pred_ids,  "Survived":y_pred})
+    kaggle.to_csv('../data/' + file_name, index=False)
 
 
 data = pd.read_csv("../data/train_featured.csv")
@@ -130,6 +135,10 @@ y = data['Survived']
 X = data.iloc[:, 2:]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 columns = [ 'Mrs', 'Miss', 'Age_ranges', 'Pclass', 'Sex', 'SibSp', 'qbin_Age2', 'Parch', 'Cabin_C']
+pred_ids = pd.read_csv("../data/pred_ids.csv")
+pred_ids = pred_ids["PassengerId"].to_list()
+test_data =  pd.read_csv("../data/test_featured.csv")
+
 
 if __name__ == "__main__":
     define_strategy(X_train, y_train)
@@ -151,5 +160,8 @@ if __name__ == "__main__":
                                               y_train)
     print("The gridcv results are : ", gridcv_res, "\n", \
               "and the random forest accuracy is: ", random_forest_res)
-    relevance_features, X_train_2, X_test_2 = select_features(rf_model, X_train,\
-                                              X_test)
+    relevance_features, X_train_2, X_test_2, best_ = select_features(rf_model,\
+                                            X_train, X_test, 8)
+    gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train_2,\
+                                            y_train)
+    run_test_data(test_data, best_, rf_model, pred_ids, "kaggle_submission.csv")

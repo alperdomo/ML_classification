@@ -2,12 +2,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def cabin_names(dataframe):
+def cabin_names(dataframe, data_type):
     """
     Hoteconodes the cabin names
 
     Parameters:
-    dataframe: training dataset Titanic
+    dataframe: Data from the Titanic dataset. Either training or test data
+    data_type: training, test
     ----------
     """
 
@@ -19,9 +20,14 @@ def cabin_names(dataframe):
                             value = int(2), regex =True)
     dataframe['Cabin'] = dataframe['Cabin'].fillna(0).astype(str).str[0]
     onehot = pd.get_dummies(dataframe['Cabin'])
-    onehot.columns = ['unk_Cabin', 'Cabin_A','Cabin_B','Cabin_C', 'Cabin_D',
-                    'Cabin_E', 'Cabin_F','Cabin_G', 'Cabin_T']
-    dataframe = pd.concat([dataframe, onehot], axis = 1)
+    if data_type == "training":
+        onehot.columns = ['unk_Cabin', 'Cabin_A','Cabin_B','Cabin_C', \
+                          'Cabin_D', 'Cabin_E', 'Cabin_F','Cabin_G', 'Cabin_T']
+        dataframe = pd.concat([dataframe, onehot], axis = 1)
+    else:
+        onehot.columns = ['unk_Cabin', 'Cabin_A','Cabin_B','Cabin_C', \
+                          'Cabin_D', 'Cabin_E', 'Cabin_F','Cabin_G']
+        dataframe = pd.concat([dataframe, onehot], axis = 1)
     return dataframe
 
 
@@ -122,15 +128,17 @@ def age_per_class(dataframe, bins_fares):
     return dataframe
 
 
-def clear_engineer(dataframe, columns):
+def clear_engineer(dataframe, columns, data_type):
     """
     clear dataframe for a list containing the name of columns that will not be
     used as classifiers for the evaluation and prediction
 
     Parameters:
     ----------
-    dataframe: training dataset Titanic
+    dataframe: Data from the Titanic dataset. Either training or test data
+    data_type: training, test
     """
+
     dataframe.drop(columns, axis = 1, inplace = True)
     dataframe.to_csv('../data/train_featured.csv', index=True)
     return dataframe
@@ -150,14 +158,14 @@ def plot_distribution_titles(dataframe):
 
 data = pd.read_csv('../data/train.csv')
 columns = ['Age', 'Name', 'Fare',  'Ticket', 'Cabin', 'Embarked', 'int_Age*Pclass']
-
+pred =
 
 if __name__ == "__main__":
-    data = cabin_names(data)
+    data = cabin_names(data, "training")
     data = name_to_titles(data)
     data, bins_fares = fares(data)
     data = gender(data)
     data = ages(data)
     data = age_per_class(data, bins_fares)
     plot_distribution_titles(data)
-    data = clear_engineer(data, columns)
+    data = clear_engineer(data, columns, "training")

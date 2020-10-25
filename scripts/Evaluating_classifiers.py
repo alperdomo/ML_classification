@@ -10,6 +10,23 @@ from sklearn.metrics import plot_confusion_matrix
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+
+
+def clear_engineer(dataframe, columns):
+    """
+    clear dataframe for a list containing the name of columns that will not be
+    used as classifiers for the evaluation and prediction
+
+    Parameters:
+    ----------
+    dataframe: training dataset Titanic
+    """
+    dataframe.drop(columns, axis = 1, inplace = True)
+    dataframe.to_csv('../data/train_featured.csv', index=True)
+    return dataframe
+
 
 def define_strategy(X_train, y_train):
     plt = matplotlib.pyplot.gcf()
@@ -50,7 +67,7 @@ def simple_regression(training_cols):
     return coef, intercept, score, model
 
 def accuracy(X_train, training_cols):
-    y_pred_dummy = dummy_clf.predict(X_train) ## NOT SURE THE DUMMY IS NEEDED
+    y_pred_dummy = dummy_clf.predict(X_train)
     y_pred_lr = model.predict(X_train[training_cols])
     accuracy = accuracy_score(y_train, y_pred_lr)
     return accuracy, y_pred_lr
@@ -78,10 +95,11 @@ def confusion_matrix_(model, training_cols, X_train, y_train):
         plt.savefig('../plots/'+name, format ="jpg")
 
 
-def precision_recall(y_train, y_pred_lr):
+def precision_recall_F1(y_train, y_pred_lr):
     precision = precision_score(y_train, y_pred_lr)
     recall = recall_score(y_train, y_pred_lr)
-    return precision, recall
+    F1 = 2 * (precision*recall)/(precision+recall)
+    return precision, recall, F1
 
 def cross_validation(model, X_train, y_train, split, score_type):
     cross_scores = cross_val_score(model, X_train, y_train, cv=int(split), \
@@ -89,6 +107,25 @@ def cross_validation(model, X_train, y_train, split, score_type):
     cross_mean = cross_scores.mean().round(3)
     cross_std = cross_scores.std()
     return cross_mean, cross_std
+
+def hyperparam_optimization(X_train, y_train):
+    model_rf = RandomForestClassifier(n_estimators = 100, max_depth = 3, max_features = 3, min_samples_split = 2)
+    param_grid = {
+    'n_estimators': [1, 3, 10, 20, 50, 100],
+    'max_depth':[1, 3, 5, 10, None]
+    }
+    gridcv = GridSearchCV(model_rf, param_grid = param_grid )
+    gridcv.fit(X_train, y_train)
+    columns = ['mean_test_score', 'std_test_score', 'mean_fit_time', \
+            'param_max_depth', 'param_n_estimators']
+    results_gridcv = pd.DataFrame(gridcv.cv_results_)
+    results_gridcv[columns].sort_values('mean_test_score', ascending=False)
+    random_forest = RandomForestClassifier(n_estimators=100, max_depth = 10, max_features =3)
+    random_forest.fit(X_train, y_train)
+    y_prediction = random_forest.predict(X_train)
+    random_forest.score(X_train, y_train)
+    acc_random_forest = round(random_forest.score(X_train, y_train) * 100, 2)
+    return results_gridcv, acc_random_forest, random_forest
 
 
 
@@ -107,10 +144,13 @@ if __name__ == "__main__":
     confusion_matrix_(model, columns, X_train, y_train)
     accuracy, y_pred_lr = accuracy(X_train, columns)
     print("The accuracy of the simple regression model is: " , accuracy)
-    precision, recall = precision_recall(y_train, y_pred_lr)
+    precision, recall, F1 = precision_recall_F1(y_train, y_pred_lr)
     print("The precision of the simple regression model is: ", precision, "\n", \
-          "and the recall is: ", recall)
+          "the recall is: ", recall, " and the F1 score is : ", F1  )
     crossval_mean, crossval_std = cross_validation(model, X_train, y_train, 5, \
                                   "accuracy")
     print("The mean for the cross valiadion score is: ", crossval_mean, "\n", \
               "and the SD is: ", crossval_std)
+    gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train, y_train)
+    print("The gridcv results are : ", gridcv_res, "\n", \
+              "and the random forest accuracy is: ", random_forest_res)

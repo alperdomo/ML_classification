@@ -138,9 +138,12 @@ def clear_engineer(dataframe, columns, data_type):
     dataframe: Data from the Titanic dataset. Either training or test data
     data_type: training, test
     """
-
-    dataframe.drop(columns, axis = 1, inplace = True)
-    dataframe.to_csv('../data/train_featured.csv', index=True)
+    if data_type == "training":
+        dataframe.drop(columns, axis = 1, inplace = True)
+        dataframe.to_csv('../data/train_featured.csv', index=False)
+    else:
+        dataframe.drop(columns, axis = 1, inplace = True)
+        dataframe.to_csv('../data/test_featured.csv', index=False)
     return dataframe
 
 

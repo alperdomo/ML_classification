@@ -128,6 +128,17 @@ def hyperparam_optimization(X_train, y_train):
     return results_gridcv, acc_random_forest, random_forest
 
 
+def select_features(rf_model, X_train, X_test):
+    relevance_features = pd.DataFrame({"Feature": X_train.columns, \
+                        "Relevance": rf_model.feature_importances_}\
+                                      ).sort_values(by="Relevance", \
+                                                    ascending=False)
+    best_8 = relevance_features["Feature"].values[:8]
+    X_train = X_train[best_8]
+    X_test = X_test[best_8]
+    return relevance_features, X_train, X_test
+
+
 
 data = pd.read_csv("../data/train_featured.csv")
 y = data['Survived']
@@ -151,6 +162,9 @@ if __name__ == "__main__":
                                   "accuracy")
     print("The mean for the cross valiadion score is: ", crossval_mean, "\n", \
               "and the SD is: ", crossval_std)
-    gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train, y_train)
+    gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train, \
+                                              y_train)
     print("The gridcv results are : ", gridcv_res, "\n", \
               "and the random forest accuracy is: ", random_forest_res)
+    relevance_features, X_train_2, X_test_2 = select_features(rf_model, X_train,\
+                                              X_test)

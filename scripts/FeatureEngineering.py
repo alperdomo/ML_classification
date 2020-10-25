@@ -128,25 +128,6 @@ def age_per_class(dataframe, bins_fares):
     return dataframe
 
 
-def clear_engineer(dataframe, columns, data_type):
-    """
-    clear dataframe for a list containing the name of columns that will not be
-    used as classifiers for the evaluation and prediction
-
-    Parameters:
-    ----------
-    dataframe: Data from the Titanic dataset. Either training or test data
-    data_type: training, test
-    """
-    if data_type == "training":
-        dataframe.drop(columns, axis = 1, inplace = True)
-        dataframe.to_csv('../data/train_featured.csv', index=False)
-    else:
-        dataframe.drop(columns, axis = 1, inplace = True)
-        dataframe.to_csv('../data/test_featured.csv', index=False)
-    return dataframe
-
-
 def plot_distribution_titles(dataframe):
     """
     Plot the distribution of passengers based on their title
@@ -159,8 +140,29 @@ def plot_distribution_titles(dataframe):
     data.plot.bar(figsize = (12, 8))
     plt.savefig('../plots/distribution_titles', format="svg")
 
+
+def clear_engineer(dataframe, columns_drop, data_type):
+    """
+    clear dataframe for a list containing the name of columns that will not be
+    used as classifiers for the evaluation and prediction
+
+    Parameters:
+    ----------
+    dataframe: Data from the Titanic dataset. Either training or test data
+    data_type: training, test
+    """
+    if data_type == "training":
+        dataframe.drop(columns_drop, axis = 1, inplace = True)
+        dataframe.to_csv('../data/train_featured.csv', index=False)
+    else:
+        columns_drop += ["PassengerId"]
+        dataframe.drop(columns_drop, axis = 1, inplace = True)
+        dataframe.to_csv('../data/test_featured.csv', index=False)
+    return dataframe
+
+
 data = pd.read_csv('../data/train.csv')
-columns = ['Age', 'Name', 'Fare',  'Ticket', 'Cabin', 'Embarked', 'int_Age*Pclass']
+columns_drop = ['Age', 'Name', 'Fare',  'Ticket', 'Cabin', 'Embarked', 'int_Age*Pclass']
 pred =
 
 if __name__ == "__main__":
@@ -171,4 +173,4 @@ if __name__ == "__main__":
     data = ages(data)
     data = age_per_class(data, bins_fares)
     plot_distribution_titles(data)
-    data = clear_engineer(data, columns, "training")
+    data = clear_engineer(data, columns_drop, "training")

@@ -13,21 +13,6 @@ from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 
-
-def clear_engineer(dataframe, columns):
-    """
-    clear dataframe for a list containing the name of columns that will not be
-    used as classifiers for the evaluation and prediction
-
-    Parameters:
-    ----------
-    dataframe: training dataset Titanic
-    """
-    dataframe.drop(columns, axis = 1, inplace = True)
-    dataframe.to_csv('../data/train_featured.csv', index=True)
-    return dataframe
-
-
 def define_strategy(X_train, y_train):
     plt = matplotlib.pyplot.gcf()
     plt.set_size_inches(12, 8)
@@ -136,7 +121,7 @@ def select_features(rf_model, X_train, X_test):
     best_8 = relevance_features["Feature"].values[:8]
     X_train = X_train[best_8]
     X_test = X_test[best_8]
-    return relevance_features, X_train, X_test
+    return relevance_features, X_train, X_test, best_8
 
 
 

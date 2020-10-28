@@ -12,6 +12,11 @@ from sklearn.metrics import recall_score
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 def define_strategy(X_train, y_train):
     plt = matplotlib.pyplot.gcf()
@@ -93,8 +98,53 @@ def cross_validation(model, X_train, y_train, split, score_type):
     cross_std = cross_scores.std()
     return cross_mean, cross_std
 
+def cross_validation_models(X_train, y_train, splits):
+    random_state = 42
+    cross_val_results = []
+    cross_val_means = []
+    cross_val_std = []
+    models = []
+    K_fold = StratifiedKFold(n_splits=splits)
+    models.append(LogisticRegression(random_state = random_state))
+    models.append(RandomForestClassifier(random_state=random_state))
+    models.append(KNeighborsClassifier())
+    models.append(SVC(random_state=random_state))
+    models.append(GradientBoostingClassifier(random_state=random_state))
+    models.append(LinearDiscriminantAnalysis())
+    for i in models :
+        cross_val_results.append(cross_val_score(i, X_train, y_train,
+                                          scoring = "accuracy",
+                                                 cv = K_fold, n_jobs=4))
+    for results in cross_val_results:
+        cross_val_means.append(results.mean())
+        cross_val_std.append(results.std())
+    cross_val_df = pd.DataFrame(
+        {"Cross_Val_Means":cross_val_means,
+         "Cross_Val_Errors": cross_val_std,
+         "Algorithms":[
+             "Logistic_Regression", "Random_Forest",
+             "K_Neighbors", "SVC", "Gradient_Boosting",
+             "LinearDiscriminantAnalysis"
+            ]
+        })
+    plt.figure(figsize=(9, 11))
+    cross_val_plot = sns.barplot("Cross_Val_Means", "Algorithms", \
+                            data = cross_val_df,
+                    palette="colorblind", orient = "h", \
+                                **{'xerr':cross_val_std})
+    cross_val_plot.set_xlabel("Accuracy (mean)")
+    cross_val_plot = cross_val_plot.set_title("Cross validation scores")
+
+
+    plt.savefig('../plots/Cross_val_algorithms.jpg', format ="jpg", \
+                bbox_inches = 'tight')
+    plt.clf()
+    return cross_val_df
+
+
 def hyperparam_optimization(X_train, y_train):
-    model_rf = RandomForestClassifier(n_estimators = 100, max_depth = 3, max_features = 3, min_samples_split = 2)
+    model_rf = RandomForestClassifier(n_estimators = 100, max_depth = 3, \
+                                    max_features = 3, min_samples_split = 2)
     param_grid = {
     'n_estimators': [1, 3, 10, 20, 50, 100],
     'max_depth':[1, 3, 5, 10, None]
@@ -105,7 +155,8 @@ def hyperparam_optimization(X_train, y_train):
             'param_max_depth', 'param_n_estimators']
     results_gridcv = pd.DataFrame(gridcv.cv_results_)
     results_gridcv[columns].sort_values('mean_test_score', ascending=False)
-    random_forest = RandomForestClassifier(n_estimators=100, max_depth = 10, max_features =3)
+    random_forest = RandomForestClassifier(n_estimators=100, max_depth = 10,
+                                        max_features =3)
     random_forest.fit(X_train, y_train)
     y_prediction = random_forest.predict(X_train)
     random_forest.score(X_train, y_train)
@@ -154,8 +205,11 @@ if __name__ == "__main__":
           "the recall is: ", recall, " and the F1 score is : ", F1  )
     crossval_mean, crossval_std = cross_validation(model, X_train, y_train, 5, \
                                   "accuracy")
-    print("The mean for the cross valiadion score is: ", crossval_mean, "\n", \
+    print("The mean for the cross validation score is: ", crossval_mean, "\n", \
               "and the SD is: ", crossval_std)
+    cross_val_df = cross_validation_models(X_train, y_train, 3)
+    print("This are the cross valifation results for multiple models", \
+         cross_val_df.head(6))
     gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train, \
                                               y_train)
     print("The gridcv results are : ", gridcv_res, "\n", \

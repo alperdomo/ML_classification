@@ -141,6 +141,27 @@ def cross_validation_models(X_train, y_train, splits):
     plt.clf()
     return cross_val_df
 
+def hyper_opt_logistic(X_train, y_train, splits):
+    K_fold = StratifiedKFold(n_splits = splits)
+    LR_model = LogisticRegression()
+    lR_parameters = {
+        "penalty" : ["l2"],
+        "C" :[0.01, 0.1, 1, 10, 100],
+        "intercept_scaling": [1, 2, 3, 4],
+        "tol" : [0.0001,0.0002,0.0003],
+        "max_iter": [100,200,300],
+        "solver":['liblinear'],
+        "verbose":[1]
+    }
+    grid_LR_model = GridSearchCV(LR_model, param_grid = lR_parameters, cv=K_fold,
+                         scoring="accuracy", n_jobs= 3, verbose = 1)
+    grid_LR_model.fit(X_train, y_train)
+    LR_model_best = grid_LR_model.best_estimator_
+    best_score_LR = grid_LR_model.best_score_
+    return best_score_LR
+
+
+
 
 def hyperparam_optimization(X_train, y_train):
     model_rf = RandomForestClassifier(n_estimators = 100, max_depth = 3, \

@@ -201,7 +201,60 @@ def hyper_opt_KNN(X_train, y_train, splits):
     RF_model_best = grid_KNN_model.best_estimator_
     best_score_KNN = grid_KNN_model.best_score_
     return best_score_KNN
-    
+
+
+def hyper_opt_SVMC(X_train, y_train, splits):
+    K_fold = StratifiedKFold(n_splits = splits)
+    SVMC_model = SVC(probability=True)
+    svmc_parameters = {
+        'C': [1, 10, 50, 100, 200, 300],
+        'kernel': ['rbf'],
+        'gamma': [0.0001, 0.001, 0.01, 0.1, 1]
+    }
+
+    grid_SVMC_model = GridSearchCV(SVMC_model, param_grid = svmc_parameters, cv = K_fold,
+                          scoring="accuracy", n_jobs= -1, verbose = 1)
+
+    grid_SVMC_model.fit(X_train,y_train)
+    SVMC_model_best = grid_SVMC_model.best_estimator_
+    best_score_SVMC = grid_SVMC_model.best_score_
+    return best_score_SVMC
+
+
+def hyper_opt_GBC(X_train, y_train, splits):
+    K_fold = StratifiedKFold(n_splits = splits)
+    GB_model = GradientBoostingClassifier()
+    GB_parameters = {
+                  'loss' : ["deviance"],
+                  'n_estimators' : [100,200,300],
+                  'learning_rate': [0.1, 0.05, 0.01, 0.001],
+                  'max_depth': [4, 8,16],
+                  'min_samples_leaf': [100,150,250],
+                  'max_features': [0.3, 0.1]
+                  }
+    gridGB_model = GridSearchCV(GB_model, param_grid = GB_parameters, cv=K_fold,
+                         scoring="accuracy", n_jobs= 3, verbose = 1)
+
+    gridGB_model.fit(X_train,y_train)
+    GB_model_best = gridGB_model.best_estimator_
+    best_score_GBC = gridGB_model.best_score_
+    return best_score_GBC
+
+
+def hyper_opt_LDA(X_train, y_train, splits):
+    K_fold = StratifiedKFold(n_splits = splits)
+    LDA_model= LinearDiscriminantAnalysis()
+    lda_parameters= {"solver" : ["svd"],
+                  "tol" : [0.0001,0.0002,0.0003]}
+
+    grid_LDA_model = GridSearchCV(LDA_model, param_grid = lda_parameters, cv=K_fold,
+                         scoring="accuracy", n_jobs= 3, verbose = 1)
+
+    grid_LDA_model.fit(X_train,y_train)
+    LDA_model_best = grid_LDA_model.best_estimator_
+    best_score_LDA = grid_LDA_model.best_score_
+    return best_score_LDA
+
 
 def hyperparam_optimization(X_train, y_train):
     model_rf = RandomForestClassifier(n_estimators = 100, max_depth = 3, \

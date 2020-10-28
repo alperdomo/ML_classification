@@ -180,6 +180,28 @@ def hyper_opt_RanForest(X_train, y_train, splits):
     return best_score_RF
 
 
+def hyper_opt_KNN(X_train, y_train, splits):
+    K_fold = StratifiedKFold(n_splits = splits)
+    KNN_model = KNeighborsClassifier()#Use GridSearch
+
+    KNN_parameters = {
+        "leaf_size" : list(range(1,50)),
+        "n_neighbors" : list(range(1,30)),
+        "p" : [1,2]
+    }
+
+    grid_KNN_model = GridSearchCV(KNN_model,
+                                  param_grid = KNN_parameters,
+                                  cv=K_fold,
+                                  scoring="accuracy",
+                                  n_jobs= 3,
+                                  verbose = 1
+                                 )
+    grid_KNN_model.fit(X_train, y_train)
+    RF_model_best = grid_KNN_model.best_estimator_
+    best_score_KNN = grid_KNN_model.best_score_
+    return best_score_KNN
+    
 
 def hyperparam_optimization(X_train, y_train):
     model_rf = RandomForestClassifier(n_estimators = 100, max_depth = 3, \

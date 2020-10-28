@@ -245,11 +245,10 @@ def hyper_opt_LDA(X_train, y_train, splits):
     K_fold = StratifiedKFold(n_splits = splits)
     LDA_model= LinearDiscriminantAnalysis()
     lda_parameters= {"solver" : ["svd"],
-                  "tol" : [0.0001,0.0002,0.0003]}
-
+                  "tol" : [0.0001,0.0002,0.0003]
+                  }
     grid_LDA_model = GridSearchCV(LDA_model, param_grid = lda_parameters, cv=K_fold,
                          scoring="accuracy", n_jobs= 3, verbose = 1)
-
     grid_LDA_model.fit(X_train,y_train)
     LDA_model_best = grid_LDA_model.best_estimator_
     best_score_LDA = grid_LDA_model.best_score_

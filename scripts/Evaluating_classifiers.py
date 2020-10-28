@@ -161,6 +161,24 @@ def hyper_opt_logistic(X_train, y_train, splits):
     return best_score_LR
 
 
+def hyper_opt_RanForest(X_train, y_train, splits):
+    K_fold = StratifiedKFold(n_splits = splits)
+    RF_model = RandomForestClassifier()
+    rf_parameters = {
+        "max_depth": [None],
+        "min_samples_split": [2, 6, 20],
+        "min_samples_leaf": [1, 4, 16],
+        "n_estimators" :[100,200,300,400],
+        "criterion": ["gini"]
+        }
+    grid_RF = GridSearchCV(RF_model, param_grid = rf_parameters, cv=K_fold,
+                         scoring="accuracy", n_jobs= 3, verbose = 1)
+
+    grid_RF.fit(X_train, y_train)
+    RF_model_best = grid_RF.best_estimator_
+    best_score_RF = grid_RF.best_score_
+    return best_score_RF
+
 
 
 def hyperparam_optimization(X_train, y_train):

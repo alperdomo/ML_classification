@@ -155,6 +155,7 @@ def clear_engineer(dataframe, columns_drop, data_type):
         dataframe.drop(columns_drop, axis = 1, inplace = True)
         dataframe.to_csv('../data/train_featured.csv', index=False)
     else:
+        columns_drop = [value for value in columns_drop if value != "Cabin_T"]
         columns_drop += ["PassengerId"]
         dataframe.drop(columns_drop, axis = 1, inplace = True)
         dataframe.to_csv('../data/test_featured.csv', index=False)

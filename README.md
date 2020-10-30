@@ -28,7 +28,7 @@ In the ML_classification_titanic we are using a very popular dataset from Kaggle
   * F1 scores
   * Cross-validation
 
-- Hyperparameters optimization: Chosing a set of optimal parameters for a learning algorithm using exhaustive search over specified parameters for estimators (GridSearchCV). Here we will use all models mentioned above.
+- Hyperparameters optimization: Choosing a set of optimal parameters for a learning algorithm using exhaustive search over specified parameters for estimators (GridSearchCV). Here we will use all models mentioned above.
   * Logistic Regression
   * RandomForestClassifier: A meta estimator  to fit a n number of decision tree classifiers on various sub-samples of the dataset
   * Support Vector Machines
@@ -36,7 +36,7 @@ In the ML_classification_titanic we are using a very popular dataset from Kaggle
   * Gradient Boosting
   * Linear Discriminant Analysis
 
-## Kaggle submissions suggest very similar performance, although LDA, GBC, SVMC occupied the top three positions.
+## The submissions to Kaggle suggest very similar performance, although LDA, GBC, SVMC occupied the top three positions.
 
 ![](images/Kaggle_Submissions.jpg)
 

@@ -154,30 +154,30 @@ def hyper_opt_logistic(X_train, y_train, splits):
         "verbose":[1]
     }
     grid_LR_model = GridSearchCV(LR_model, param_grid = lR_parameters, cv=K_fold,
-                         scoring="accuracy", n_jobs= 3, verbose = 1)
+                         scoring="accuracy", n_jobs= 5, verbose = 1)
     grid_LR_model.fit(X_train, y_train)
     LR_model_best = grid_LR_model.best_estimator_
     best_score_LR = grid_LR_model.best_score_
-    return best_score_LR
+    return best_score_LR, LR_model_best
 
 
 def hyper_opt_RanForest(X_train, y_train, splits):
     K_fold = StratifiedKFold(n_splits = splits)
     RF_model = RandomForestClassifier()
     rf_parameters = {
-        "max_depth": [None],
+        "max_depth": [3, 6, 9, 12, None],
         "min_samples_split": [2, 6, 20],
         "min_samples_leaf": [1, 4, 16],
         "n_estimators" :[100,200,300,400],
         "criterion": ["gini"]
         }
     grid_RF = GridSearchCV(RF_model, param_grid = rf_parameters, cv=K_fold,
-                         scoring="accuracy", n_jobs= 3, verbose = 1)
+                         scoring="accuracy", n_jobs= 5, verbose = 1)
 
     grid_RF.fit(X_train, y_train)
     RF_model_best = grid_RF.best_estimator_
     best_score_RF = grid_RF.best_score_
-    return best_score_RF
+    return best_score_RF, RF_model_best
 
 
 def hyper_opt_KNN(X_train, y_train, splits):
@@ -194,13 +194,13 @@ def hyper_opt_KNN(X_train, y_train, splits):
                                   param_grid = KNN_parameters,
                                   cv=K_fold,
                                   scoring="accuracy",
-                                  n_jobs= 3,
+                                  n_jobs= 5,
                                   verbose = 1
                                  )
     grid_KNN_model.fit(X_train, y_train)
-    RF_model_best = grid_KNN_model.best_estimator_
+    KNN_model_best = grid_KNN_model.best_estimator_
     best_score_KNN = grid_KNN_model.best_score_
-    return best_score_KNN
+    return best_score_KNN, KNN_model_best
 
 
 def hyper_opt_SVMC(X_train, y_train, splits):
@@ -218,7 +218,7 @@ def hyper_opt_SVMC(X_train, y_train, splits):
     grid_SVMC_model.fit(X_train,y_train)
     SVMC_model_best = grid_SVMC_model.best_estimator_
     best_score_SVMC = grid_SVMC_model.best_score_
-    return best_score_SVMC
+    return best_score_SVMC, SVMC_model_best
 
 
 def hyper_opt_GBC(X_train, y_train, splits):
@@ -233,43 +233,61 @@ def hyper_opt_GBC(X_train, y_train, splits):
                   'max_features': [0.3, 0.1]
                   }
     gridGB_model = GridSearchCV(GB_model, param_grid = GB_parameters, cv=K_fold,
-                         scoring="accuracy", n_jobs= 3, verbose = 1)
+                         scoring="accuracy", n_jobs= 5, verbose = 1)
 
     gridGB_model.fit(X_train,y_train)
     GB_model_best = gridGB_model.best_estimator_
     best_score_GBC = gridGB_model.best_score_
-    return best_score_GBC
+    return best_score_GBC, GB_model_best
 
 
 def hyper_opt_LDA(X_train, y_train, splits):
     K_fold = StratifiedKFold(n_splits = splits)
     LDA_model= LinearDiscriminantAnalysis()
     lda_parameters= {"solver" : ["svd"],
-                  "tol" : [0.0001,0.0002,0.0003]
-                  }
+                  "tol" : [0.0001,0.0002,0.0003]}
+
     grid_LDA_model = GridSearchCV(LDA_model, param_grid = lda_parameters, cv=K_fold,
-                         scoring="accuracy", n_jobs= 3, verbose = 1)
+                         scoring="accuracy", n_jobs= 5, verbose = 1)
+
     grid_LDA_model.fit(X_train,y_train)
     LDA_model_best = grid_LDA_model.best_estimator_
     best_score_LDA = grid_LDA_model.best_score_
-    return best_score_LDA
+    return best_score_LDA, LDA_model_best
 
 
-def hyperparam_optimization(X_train, y_train):
+def general_hyper(X_train, y_train, splits):
+    best_LR, LR_mbest = hyper_opt_logistic(X_train, y_train, splits)
+    best_RF, RF_mbest = hyper_opt_RanForest(X_train, y_train, splits)
+    best_KNN, KNN_mbest = hyper_opt_KNN(X_train, y_train, splits)
+    best_SVMC, SVMC_mbest = hyper_opt_SVMC(X_train, y_train, splits)
+    best_GBC, GBC_mbest = hyper_opt_GBC(X_train, y_train, splits)
+    best_score_LDA, LDA_mbest = hyper_opt_LDA(X_train, y_train, splits)
+    return best_LR, LR_mbest, best_RF, RF_mbest, best_KNN, KNN_mbest, \
+           best_SVMC, SVMC_mbest, best_score_GBC, GBC_mbest, \
+           best_score_LDA, LDA_mbest
+
+def hyperparam_optimization(X_train, y_train, splits):
+    K_fold = StratifiedKFold(n_splits = splits)
     model_rf = RandomForestClassifier(n_estimators = 100, max_depth = 3, \
-                                    max_features = 3, min_samples_split = 2)
-    param_grid = {
-    'n_estimators': [1, 3, 10, 20, 50, 100],
-    'max_depth':[1, 3, 5, 10, None]
-    }
-    gridcv = GridSearchCV(model_rf, param_grid = param_grid )
-    gridcv.fit(X_train, y_train)
+                                      max_features = 3, min_samples_split = splits)
+    rf_parameters = {
+        "max_depth": [3, 6, 9, 12, None],
+        "min_samples_split": [2, 6, 20],
+        "min_samples_leaf": [1, 4, 16],
+        "n_estimators" :[100,200,300,400],
+        "criterion": ["gini"]
+        }
+
+    grid_RF = GridSearchCV(RF_model, param_grid = rf_parameters, cv=K_fold,
+                         scoring="accuracy", n_jobs= 3, verbose = 1)
+    grid_RF.fit(X_train, y_train)
     columns = ['mean_test_score', 'std_test_score', 'mean_fit_time', \
             'param_max_depth', 'param_n_estimators']
-    results_gridcv = pd.DataFrame(gridcv.cv_results_)
+    results_gridcv = pd.DataFrame(grid_RF.cv_results_)
     results_gridcv[columns].sort_values('mean_test_score', ascending=False)
-    random_forest = RandomForestClassifier(n_estimators=100, max_depth = 10,
-                                        max_features =3)
+    random_forest = RandomForestClassifier(n_estimators=100, max_depth = 10,\
+                                           max_features =3)
     random_forest.fit(X_train, y_train)
     y_prediction = random_forest.predict(X_train)
     random_forest.score(X_train, y_train)
@@ -309,24 +327,61 @@ if __name__ == "__main__":
     dummy_clf = build_dummy()
     coef, intercept, score, model = simple_regression(columns)
     print("Simple regression results:\nscore: " + str(score), \
-      "\ncoef: " + str(coef), "\nintercept: " + str(intercept))
+      "\ncoef: " + str(coef), "\nintercept: " + str(intercept), "\n")
     confusion_matrix_(model, columns, X_train, y_train)
     accuracy, y_pred_lr = accuracy(X_train, columns)
-    print("The accuracy of the simple regression model is: " , accuracy)
+    print("\nThe accuracy of the simple regression model is: " , accuracy, "\n")
     precision, recall, F1 = precision_recall_F1(y_train, y_pred_lr)
     print("The precision of the simple regression model is: ", precision, "\n", \
-          "the recall is: ", recall, " and the F1 score is : ", F1  )
+          "the recall is: ", recall, " and the F1 score is : ", F1 , "\n")
     crossval_mean, crossval_std = cross_validation(model, X_train, y_train, 5, \
-                                  "accuracy")
+                                  "accuracy", "\n")
     print("The mean for the cross validation score is: ", crossval_mean, "\n", \
-              "and the SD is: ", crossval_std)
+              "and the SD is: ", crossval_std, "\n")
     cross_val_df = cross_validation_models(X_train, y_train, 3)
     print("This are the cross valifation results for multiple models", \
-         cross_val_df.head(6))
+         cross_val_df.head(6), "\n")
+    print("\n\nRunning general function for hyperparameters optimization\n\n")
+    LR_best, LR_model, RF_best, RF_model, KNN_best, KNN_model, SVMC_best, \
+    SVMC_model, GBC_best, GBC_model, LDA_best, LDA_model = \
+                        general_hyper(X_train, y_train, 3)
+    print("\n\n Running all 6 MODELS on unseen Test data\n\n")
+    LR_model.fit(X_train, y_train)
+    print('Logistic Regresion training score: ', \
+            LR_model.score(X_train, y_train).round(3))
+    print('Logistic Regresion test score: ', \
+            LR_model.score(X_test, y_test).round(3))
+    RF_model.fit(X_train, y_train)
+    print('Random Forest training score: ', \
+            RF_model.score(X_train, y_train).round(3))
+    print('Random Forest test score: ', \
+            RF_model.score(X_test, y_test).round(3))
+    KNN_model.fit(X_train, y_train)
+    print('K neigbors training score: ', \
+            KNN_model.score(X_train, y_train).round(3))
+    print('K neigbors test score: ', \
+            KNN_model.score(X_test, y_test).round(3))
+    SVMC_model.fit(X_train, y_train)
+    print('Support Vector Machine training score: ', \
+            SVMC_model.score(X_train, y_train).round(3))
+    print('Support Vector Machine test score: ', \
+            SVMC_model.score(X_test, y_test).round(3))
+
+    GBC_model.fit(X_train, y_train)
+    print('Gradient Boosting training score: ', \
+            GBC_model.score(X_train, y_train).round(3))
+    print('Gradient Boosting test score : ', \
+            GBC_model.score(X_test, y_test).round(3))
+    LDA_model.fit(X_train, y_train)
+    print('Linear Discriminant Analysis  training score: ', \
+            LDA_model.score(X_train, y_train).round(3))
+    print('Linear Discriminant Analysis  test score: ', \
+            LDA_model.score(X_test, y_test).round(3))
+
     gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train, \
                                               y_train)
     print("The gridcv results are : ", gridcv_res, "\n", \
-              "and the random forest accuracy is: ", random_forest_res)
+              "and the random forest accuracy is: ", random_forest_res, "\n")
     relevance_features, X_train_2, X_test_2, best_ = select_features(rf_model,\
                                             X_train, X_test, 8)
     gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train_2,\

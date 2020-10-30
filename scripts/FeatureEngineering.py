@@ -172,7 +172,7 @@ def engineer_test_kaggle(test_data):
     pred =  clear_engineer(pred, columns_drop, "test")
 
 data = pd.read_csv('../data/train.csv')
-columns_drop = ['Age', 'Name', 'Fare',  'Ticket', 'Cabin', 'Embarked', 'int_Age*Pclass']
+columns_drop = ['Age', 'Name', 'Fare',  'Ticket', 'Cabin', 'Embarked', 'int_Age*Pclass', "Cabin_T"]
 test_data  = pd.read_csv('../data/test.csv')
 
 if __name__ == "__main__":

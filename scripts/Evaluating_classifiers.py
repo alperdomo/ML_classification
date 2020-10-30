@@ -262,10 +262,10 @@ def general_hyper(X_train, y_train, splits):
     best_KNN, KNN_mbest = hyper_opt_KNN(X_train, y_train, splits)
     best_SVMC, SVMC_mbest = hyper_opt_SVMC(X_train, y_train, splits)
     best_GBC, GBC_mbest = hyper_opt_GBC(X_train, y_train, splits)
-    best_score_LDA, LDA_mbest = hyper_opt_LDA(X_train, y_train, splits)
+    best_LDA, LDA_mbest = hyper_opt_LDA(X_train, y_train, splits)
     return best_LR, LR_mbest, best_RF, RF_mbest, best_KNN, KNN_mbest, \
-           best_SVMC, SVMC_mbest, best_score_GBC, GBC_mbest, \
-           best_score_LDA, LDA_mbest
+           best_SVMC, SVMC_mbest, best_GBC, GBC_mbest, \
+           best_LDA, LDA_mbest
 
 def hyperparam_optimization(X_train, y_train, splits):
     K_fold = StratifiedKFold(n_splits = splits)
@@ -335,7 +335,7 @@ if __name__ == "__main__":
     print("The precision of the simple regression model is: ", precision, "\n", \
           "the recall is: ", recall, " and the F1 score is : ", F1 , "\n")
     crossval_mean, crossval_std = cross_validation(model, X_train, y_train, 5, \
-                                  "accuracy", "\n")
+                                  "accuracy")
     print("The mean for the cross validation score is: ", crossval_mean, "\n", \
               "and the SD is: ", crossval_std, "\n")
     cross_val_df = cross_validation_models(X_train, y_train, 3)

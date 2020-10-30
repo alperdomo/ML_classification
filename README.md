@@ -18,7 +18,7 @@ In the ML_classification_titanic we are using a very popular dataset from Kaggle
 - Gradient Boosting (GBC)
 - Linear Discriminant Analysis (LDA)
 
-`The pipeline includes the following steps:`
+### `The pipeline includes the following steps:`
 
 1. Data Exploratory Analysis (DEA): Approach to analyzing the raw data set to identify and summarize the main characteristics using visualization methods.
 
@@ -34,7 +34,7 @@ In the ML_classification_titanic we are using a very popular dataset from Kaggle
 
 4. Hyperparameters optimization: Choosing a set of optimal parameters for a learning algorithm using exhaustive search over specified parameters for estimators (GridSearchCV). Here we will use all models mentioned above.
   * Logistic Regression
-  * RandomForestClassifier: A meta estimator  to fit a n number of decision tree classifiers on various sub-samples of the dataset
+  * Random Forest: A meta estimator  to fit a n number of decision tree classifiers on various sub-samples of the dataset
   * Support Vector Machines
   * K neighbors
   * Gradient Boosting

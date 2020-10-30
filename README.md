@@ -1,4 +1,4 @@
-# ML_classification: An example using the Titanic dataset
+# `Machine Learning for classification (ML_classification) tasks`: Supervised learning using the Titanic data set.
 There are many different machine learning (ML) systems. Based on their purposes and features, they are classified in different types: Superivised-, unsupervised-, semisupervised-, and reinforcement- learning (Geron, 2019).
 
 In the case of Supervised ML, a typical task is classification. In such ML task an algorithm is trained, "fed", with the data and the desired solutions.

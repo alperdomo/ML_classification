@@ -40,6 +40,8 @@ In the ML_classification_titanic we are using a very popular dataset from Kaggle
   * Gradient Boosting
   * Linear Discriminant Analysis
 
+![](plots/Cross_val_algorithms.jpg)
+
 #### The submissions to Kaggle suggest very similar performance, although LDA, GBC, SVMC occupied the top three positions.
 
 ![](images/Kaggle_Submissions.jpg)

@@ -20,16 +20,19 @@ In the ML_classification_titanic we are using a very popular dataset from Kaggle
 
 `The pipeline includes the following steps:`
 
-- Data Exploratory Analysis (DEA): Approach to analyzing the raw data set to identify and summarize the main characteristics using visualization methods.
-- Feature engineering: Using domain specific knowledge, or learning from the DEA step, to extract features form the data. The way these features are extracted can remarkably improve the performance of the ML algorithms.
-- Training the model (Evaluating classifiers): Measuring the performance achieved by a ML algorithm by considering the performance of a classifier on an independent test set.  
+1. Data Exploratory Analysis (DEA): Approach to analyzing the raw data set to identify and summarize the main characteristics using visualization methods.
+
+2. Feature engineering: Using domain specific knowledge, or learning from the DEA step, to extract features form the data. The way these features are extracted can remarkably improve the performance of the ML algorithms.
+
+3. Training the model (Evaluating classifiers): Measuring the performance achieved by a ML algorithm by considering the performance of a classifier on an independent test set.  
   * Strategy definition
   * Accuracy
   * Precision
   * Recall
   * F1 scores
   * Cross-validation
-- Hyperparameters optimization: Choosing a set of optimal parameters for a learning algorithm using exhaustive search over specified parameters for estimators (GridSearchCV). Here we will use all models mentioned above.
+
+4. Hyperparameters optimization: Choosing a set of optimal parameters for a learning algorithm using exhaustive search over specified parameters for estimators (GridSearchCV). Here we will use all models mentioned above.
   * Logistic Regression
   * RandomForestClassifier: A meta estimator  to fit a n number of decision tree classifiers on various sub-samples of the dataset
   * Support Vector Machines

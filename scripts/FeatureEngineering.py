@@ -161,15 +161,26 @@ def clear_engineer(dataframe, columns_drop, data_type):
         dataframe.to_csv('../data/test_featured.csv', index=False)
     return dataframe
 
-def engineer_test_kaggle(test_data):
+def engineer_test_kaggle(test_data, data_type):
+    """
+    Data engineers the original test data set from Kaggle.
+
+    Parameters:
+    ----------
+    test_data: Data frame from Test data.
+    data_type: string "test"
+    """
     pred = test_data
-    pred = cabin_names(pred, "test")
+    pred_ids = pred["PassengerId"]
+    pred = cabin_names(pred, data_type)
     pred =  name_to_titles(pred)
     pred, pred_bins_fares = fares(pred)
     pred =  gender(pred)
     pred =  ages(pred)
     pred =  age_per_class(pred, pred_bins_fares)
-    pred =  clear_engineer(pred, columns_drop, "test")
+    pred =  clear_engineer(pred, columns_drop, data_type)
+    pred_ids.to_csv('../data/pred_ids.csv', index=False)
+    return pred_ids
 
 data = pd.read_csv('../data/train.csv')
 columns_drop = ['Age', 'Name', 'Fare',  'Ticket', 'Cabin', 'Embarked', 'int_Age*Pclass', "Cabin_T"]

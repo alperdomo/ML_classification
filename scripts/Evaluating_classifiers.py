@@ -26,7 +26,8 @@ def define_strategy(X_train, y_train):
 
     for clfs in strats:
         if clfs == 'constant':
-            dummy_clf = DummyClassifier(strategy = clfs, random_state = 0, constant = 0)
+            dummy_clf = DummyClassifier(strategy = clfs, random_state = 0, \
+                                        constant = 0)
         else:
             dummy_clf = DummyClassifier(strategy = clfs, random_state = 0)
         dummy_clf.fit(X_train, y_train)
@@ -153,8 +154,8 @@ def hyper_opt_logistic(X_train, y_train, splits):
         "solver":['liblinear'],
         "verbose":[1]
     }
-    grid_LR_model = GridSearchCV(LR_model, param_grid = lR_parameters, cv=K_fold,
-                         scoring="accuracy", n_jobs= 5, verbose = 1)
+    grid_LR_model = GridSearchCV(LR_model, param_grid = lR_parameters, \
+                        cv=K_fold, scoring="accuracy", n_jobs= 5, verbose = 1)
     grid_LR_model.fit(X_train, y_train)
     LR_model_best = grid_LR_model.best_estimator_
     best_score_LR = grid_LR_model.best_score_
@@ -171,7 +172,7 @@ def hyper_opt_RanForest(X_train, y_train, splits):
         "n_estimators" :[100,200,300,400],
         "criterion": ["gini"]
         }
-    grid_RF = GridSearchCV(RF_model, param_grid = rf_parameters, cv=K_fold,
+    grid_RF = GridSearchCV(RF_model, param_grid = rf_parameters, cv=K_fold, \
                          scoring="accuracy", n_jobs= 5, verbose = 1)
 
     grid_RF.fit(X_train, y_train)
@@ -212,8 +213,8 @@ def hyper_opt_SVMC(X_train, y_train, splits):
         'gamma': [0.0001, 0.001, 0.01, 0.1, 1]
     }
 
-    grid_SVMC_model = GridSearchCV(SVMC_model, param_grid = svmc_parameters, cv = K_fold,
-                          scoring="accuracy", n_jobs= -1, verbose = 1)
+    grid_SVMC_model = GridSearchCV(SVMC_model, param_grid = svmc_parameters, \
+                        cv = K_fold, scoring="accuracy", n_jobs= -1, verbose = 1)
 
     grid_SVMC_model.fit(X_train,y_train)
     SVMC_model_best = grid_SVMC_model.best_estimator_
@@ -247,8 +248,9 @@ def hyper_opt_LDA(X_train, y_train, splits):
     lda_parameters= {"solver" : ["svd"],
                   "tol" : [0.0001,0.0002,0.0003]}
 
-    grid_LDA_model = GridSearchCV(LDA_model, param_grid = lda_parameters, cv=K_fold,
-                         scoring="accuracy", n_jobs= 5, verbose = 1)
+    grid_LDA_model = GridSearchCV(LDA_model, param_grid = lda_parameters, \
+                                cv=K_fold, scoring="accuracy", \
+                                n_jobs= 5, verbose = 1)
 
     grid_LDA_model.fit(X_train,y_train)
     LDA_model_best = grid_LDA_model.best_estimator_
@@ -270,7 +272,8 @@ def general_hyper(X_train, y_train, splits):
 def hyperparam_optimization(X_train, y_train, splits):
     K_fold = StratifiedKFold(n_splits = splits)
     model_rf = RandomForestClassifier(n_estimators = 100, max_depth = 3, \
-                                      max_features = 3, min_samples_split = splits)
+                                      max_features = 3, \
+                                      min_samples_split = splits)
     rf_parameters = {
         "max_depth": [3, 6, 9, 12, None],
         "min_samples_split": [2, 6, 20],
@@ -295,9 +298,9 @@ def hyperparam_optimization(X_train, y_train, splits):
     return results_gridcv, acc_random_forest, random_forest
 
 
-def select_features(rf_model, X_train, X_test, features):
+def select_features(RF_model, X_train, X_test, features):
     relevance_features = pd.DataFrame({"Feature": X_train.columns, \
-                        "Relevance": rf_model.feature_importances_}\
+                        "Relevance": RF_model.feature_importances_}\
                                       ).sort_values(by="Relevance", \
                                                     ascending=False)
     best_ = relevance_features["Feature"].values[:int(features)]
@@ -305,18 +308,35 @@ def select_features(rf_model, X_train, X_test, features):
     X_test = X_test[best_]
     return relevance_features, X_train, X_test, best_
 
-def run_test_data(pred, best_, rf_model, pred_ids, file_name):
-    pred = pred[best_]
-    y_pred = rf_model.predict(pred)
-    kaggle = pd.DataFrame({"PassengerId":pred_ids,  "Survived":y_pred})
-    kaggle.to_csv('../data/' + file_name, index=False)
+
+def run_test_data(pred, LR_model, RF_model, KNN_model, SVMC_model, \
+                  GBC_model, LDA_model, pred_ids):
+    y_pred_LR = LR_model.predict(pred)
+    y_pred_RF = RF_model.predict(pred)
+    y_pred_KNN = KNN_model.predict(pred)
+    y_pred_SVMC = SVMC_model.predict(pred)
+    y_pred_GBC = GBC_model.predict(pred)
+    y_pred_LDA = LDA_model.predict(pred)
+    y_pred_LR = pd.DataFrame({"PassengerId":pred_ids,  "Survived":y_pred_LR})
+    y_pred_RF = pd.DataFrame({"PassengerId":pred_ids,  "Survived":y_pred_RF})
+    y_pred_KNN = pd.DataFrame({"PassengerId":pred_ids,  "Survived":y_pred_KNN})
+    y_pred_GBC = pd.DataFrame({"PassengerId":pred_ids,  "Survived":y_pred_GBC})
+    y_pred_SVMC = pd.DataFrame({"PassengerId":pred_ids,  "Survived":y_pred_SVMC})
+    y_pred_LDA = pd.DataFrame({"PassengerId":pred_ids,  "Survived":y_pred_LDA})
+    y_pred_LR.to_csv('../data/' + "LR_kaggle.csv", index=False)
+    y_pred_RF.to_csv('../data/' + "RF_kaggle.csv", index=False)
+    y_pred_KNN.to_csv('../data/' + "KNN_kaggle.csv", index=False)
+    y_pred_SVMC.to_csv('../data/' + "SVMC_kaggle.csv", index=False)
+    y_pred_GBC.to_csv('../data/' + "GBC_kaggle.csv", index=False)
+    y_pred_LDA.to_csv('../data/' + "LDA_kaggle.csv", index=False)
 
 
 data = pd.read_csv("../data/train_featured.csv")
 y = data['Survived']
 X = data.iloc[:, 2:]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-columns = [ 'Mrs', 'Miss', 'Age_ranges', 'Pclass', 'Sex', 'SibSp', 'qbin_Age2', 'Parch', 'Cabin_C']
+columns = [ 'Mrs', 'Miss', 'Age_ranges', 'Pclass', 'Sex', 'SibSp', 'qbin_Age2',\
+        'Parch', 'Cabin_C']
 pred_ids = pd.read_csv("../data/pred_ids.csv")
 pred_ids = pred_ids["PassengerId"].to_list()
 test_data =  pd.read_csv("../data/test_featured.csv")
@@ -339,7 +359,7 @@ if __name__ == "__main__":
     print("The mean for the cross validation score is: ", crossval_mean, "\n", \
               "and the SD is: ", crossval_std, "\n")
     cross_val_df = cross_validation_models(X_train, y_train, 3)
-    print("This are the cross valifation results for multiple models", \
+    print("These are the cross validation results for multiple models", \
          cross_val_df.head(6), "\n")
     print("\n\nRunning general function for hyperparameters optimization\n\n")
     LR_best, LR_model, RF_best, RF_model, KNN_best, KNN_model, SVMC_best, \
@@ -377,13 +397,15 @@ if __name__ == "__main__":
             LDA_model.score(X_train, y_train).round(3))
     print('Linear Discriminant Analysis  test score: ', \
             LDA_model.score(X_test, y_test).round(3))
-
+    print("\n\nRunning fine tuned models on unseen data from Kaggle and saving \
+         results for submission")
+    run_test_data(test_data, LR_model, RF_model, KNN_model, SVMC_model, \
+                  GBC_model, LDA_model,  pred_ids)
     gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train, \
-                                              y_train)
+                                              y_train, 3)
     print("The gridcv results are : ", gridcv_res, "\n", \
               "and the random forest accuracy is: ", random_forest_res, "\n")
-    relevance_features, X_train_2, X_test_2, best_ = select_features(rf_model,\
+    relevance_features, X_train_2, X_test_2, best_ = select_features(RF_model, \
                                             X_train, X_test, 8)
-    gridcv_res, random_forest_res, rf_model = hyperparam_optimization(X_train_2,\
-                                            y_train)
-    run_test_data(test_data, best_, rf_model, pred_ids, "kaggle_submission.csv")
+    gridcv_res, RF_res, RF_model2 = hyperparam_optimization(X_train_2, \
+                                                            y_train, 3)

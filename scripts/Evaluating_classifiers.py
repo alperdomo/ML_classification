@@ -386,7 +386,6 @@ if __name__ == "__main__":
             SVMC_model.score(X_train, y_train).round(3))
     print('Support Vector Machine test score: ', \
             SVMC_model.score(X_test, y_test).round(3))
-
     GBC_model.fit(X_train, y_train)
     print('Gradient Boosting training score: ', \
             GBC_model.score(X_train, y_train).round(3))

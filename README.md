@@ -3,7 +3,7 @@ There are many different machine learning (ML) systems. Based on their purposes 
 
 In the case of Supervised ML, a typical task is classification. In such ML task an algorithm is trained, "fed", with the data and the desired solutions.
 
-This image represents a  basic pipeline for a supervised ML Automation and evaluation
+This image represents a  basic pipeline for a supervised ML automation and evaluation process.
 
 ![](images/Data_Types_titanic.jpg)
 Note: Image adapted from wikipedia: https://en.wikipedia.org/wiki/Data#/media/File:Data_types_-_en.svg
